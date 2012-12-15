@@ -33,4 +33,15 @@
 ; \ _ /   \ _ /   \ _ /   \ _ /
     (let [clusters (find-clusters[[1 1 1 1] [1 1 1 1] [1 1 1 1] [1 1 1 1]])]
       (is (and (= 1 (count clusters))
-               (= 16 (count (first clusters))))))))
+               (= 16 (count (first clusters))))))
+;
+; butterfly-like cluster
+;       _       _       _       _
+;   _ / 1 \ _ / 0 \ _ / 0 \ _ / 1 \
+; / 2 \ _ / 3 \ _ / 0 \ _ / 4 \ _ /
+; \ _ / 5 \ _ / 0 \ _ / 0 \ _ / 6 \
+; / 1 \ _ / 1 \ _ / 1 \ _ / 1 \ _ /
+; \ _ /   \ _ /   \ _ /   \ _ /
+    (let [clusters (find-clusters [[1 0 0 1] [2 3 0 4] [5 0 0 6] [1 1 1 1]])]
+      (is (and (= 1 (count clusters))
+               (= 5 (count (first clusters))))))))

@@ -54,26 +54,27 @@
   (do (doseq [c s] (.putCharacter t c))
       (crlf t current-line)))
 
-(defn- apply-style [^Terminal t v is-cell is-triple is-cluster-cell]
+(defn- apply-style [^Terminal t v is-cell-value is-in-triple is-in-cluster]
   (letfn [(applySGR [sgr]
             (.applySGR t (into-array [sgr])))]
-   (do (if is-cell
+   (do (if is-cell-value
          (.applyForegroundColor t (get-color v))
          (.applyForegroundColor t Terminal$Color/DEFAULT))
-       (if is-triple (applySGR Terminal$SGR/ENTER_REVERSE))
-       (if is-cluster-cell (applySGR Terminal$SGR/ENTER_BLINK))
-       (if-not (or is-cell is-triple is-cluster-cell)
+       (if is-in-triple (applySGR Terminal$SGR/ENTER_REVERSE))
+       (if is-in-cluster (applySGR Terminal$SGR/ENTER_BLINK))
+       (if-not (or is-cell-value is-in-triple is-in-cluster)
          (applySGR Terminal$SGR/RESET_ALL)))))
 
 (defn- print-board [^Terminal t board-seq current-line]
   (loop [s board-seq current-line current-line]
     (if (seq s)
-      (let [{:keys [char is-cell is-triple is-cluster-cell]} (first s)]
-        (if (= char \newline)
+      (let [{:keys [value is-cell-value is-in-triple is-in-cluster]} (first s)]
+        (if (= value \newline)
           (do (crlf t current-line)
               (recur (rest s) (inc current-line)))
-          (do (apply-style t char is-cell is-triple is-cluster-cell)
-              (.putCharacter t (if is-cluster-cell \o (if is-cell \* char)))
+          (do (apply-style t value is-cell-value is-in-triple is-in-cluster)
+              (.putCharacter t (if is-in-cluster \o
+                                   (if is-cell-value \* value)))
               (recur (rest s) current-line))))
       (crlf t current-line))))
 

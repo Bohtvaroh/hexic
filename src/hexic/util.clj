@@ -33,7 +33,3 @@
       "Linux" :unix
       "Windows" :windows
       :other)))
-
-(defmulti to-char class)
-(defmethod to-char Long [l] (.charAt (str l) 0))
-(defmethod to-char Character [c] c)
