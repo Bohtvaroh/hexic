@@ -39,7 +39,7 @@
                       System/in System/out (Charset/forName "UTF-8"))]
     (case (u/os-type)
      :unix (create-unix)
-     :else (SwingTerminal.))))
+     (SwingTerminal.))))
 
 (defn- reset-terminal [^Terminal t]
   (.moveCursor t 0 0)
@@ -73,7 +73,7 @@
           (do (crlf t current-line)
               (recur (rest s) (inc current-line)))
           (do (apply-style t char is-cell is-triple is-cluster-cell)
-              (.putCharacter t (if is-cell \* char))
+              (.putCharacter t (if is-cluster-cell \o (if is-cell \* char)))
               (recur (rest s) current-line))))
       (crlf t current-line))))
 
@@ -88,7 +88,8 @@
                  (do (swap! paused (constantly false))
                      (update-last-turn-time))
                  (do (swap! paused (constantly true))
-                     (recur t))))
+                     (recur t)))
+        nil)
       (if @paused
         (do (Thread/sleep 1000)
             (recur t))))))

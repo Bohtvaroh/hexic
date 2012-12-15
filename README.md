@@ -53,3 +53,7 @@ Two UI modes are supported: improved and fallback. Fallback mode is just an ASCI
 
 ![Improved UI screenshot](http://img547.imageshack.us/img547/2528/screenshot20121215at720.png)
 ![Improved UI screenshot](http://img837.imageshack.us/img837/4167/screenshot20121215at726.png)
+
+## Demo
+
+Improved UI mode demo [video](http://youtu.be/lVU6DLSdGQ4) on Youtube.
