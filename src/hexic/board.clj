@@ -63,7 +63,8 @@
       b)))
 
 (defn- find-cluster
-  "Returns a set of cluster coordinates or nil if no cluster was found."
+  "Returns a set of cluster coordinates around coord or nil
+  if no cluster was found."
   [board coord]
   (let [value (value-at-cell board coord)
         neighbors (neighbor-cells board coord)
@@ -74,7 +75,7 @@
     (if (seq cluster-coords)
       (conj cluster-coords coord) nil)))
 
-(defn- find-clusters
+(defn find-clusters
   "Returns a seq of found clusters coordinates sets."
   [board]
   (letfn
