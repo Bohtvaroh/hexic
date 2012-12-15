@@ -43,9 +43,7 @@ $ java -jar target/hexic-0.1.0-SNAPSHOT-standalone.jar usage
 Options allowed:
 
  improved-ui - start in improved UI mode
-
  fallback-ui - start in fallback UI mode (default on Windows)
-
  usage - print this information and exit
 </pre>
 
@@ -53,4 +51,5 @@ Options allowed:
 
 Two UI modes are supported: improved and fallback. Fallback mode is just an ASCII console output whether improved mode updates its console output in place and uses some colors and font styling. Improved mode is used by default on Max OS X and Linux. Fallback mode is default on Windows. You can force improved mode on Windows by supplying 'improved-ui' command-line argument.
 
-![Improved UI screenshot](http://img39.imageshack.us/img39/2528/screenshot20121215at720.png)
+![Improved UI screenshot](http://img547.imageshack.us/img547/2528/screenshot20121215at720.png)
+![Improved UI screenshot](http://img837.imageshack.us/img837/4167/screenshot20121215at726.png)
