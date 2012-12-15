@@ -3,7 +3,7 @@ pom.xml
 *.class
 /lib/
 /classes/
-/targets/
+/target/
 .lein-deps-sum
 .lein-failures
 .lein-plugins
