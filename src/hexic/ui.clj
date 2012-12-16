@@ -21,7 +21,7 @@
     Terminal$Color/DEFAULT))
 
 (def ^:private last-turn-time (atom nil))
-(def ^:private min-turn-duration "Minimum turn duration in ms." 2000)
+(def ^:private min-turn-duration "Minimum turn duration in ms." 1600)
 (defn- update-last-turn-time []
   #(swap! last-turn-time (constantly (System/currentTimeMillis))))
 (defn- wait-turn []
@@ -73,8 +73,9 @@
           (do (crlf t current-line)
               (recur (rest s) (inc current-line)))
           (do (apply-style t value is-cell-value is-in-triple is-in-cluster)
-              (.putCharacter t (if is-in-cluster \o
-                                   (if is-cell-value \* value)))
+              (.putCharacter t (cond is-in-cluster \o
+                                     is-cell-value \*
+                                     :else value))
               (recur (rest s) current-line))))
       (crlf t current-line))))
 
@@ -92,7 +93,7 @@
                      (recur t)))
         nil)
       (if @paused
-        (do (Thread/sleep 1000)
+        (do (Thread/sleep 800)
             (recur t))))))
 
 (defn start-improved [initial-board turns]
