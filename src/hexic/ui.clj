@@ -26,8 +26,7 @@
   #(swap! last-turn-time (constantly (System/currentTimeMillis))))
 (defn- wait-turn []
   (let [current-time (System/currentTimeMillis)
-        prev-time @last-turn-time
-        time-spent (if prev-time (- current-time prev-time) 0)
+        time-spent (if @last-turn-time (- current-time @last-turn-time) 0)
         time-left (- min-turn-duration time-spent)]
     (if (pos? time-left)
       (Thread/sleep time-left))
