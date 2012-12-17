@@ -47,8 +47,8 @@
 
 (defn- crlf [^Terminal t current-line]
   (let [next-line (inc current-line)]
-    (do (.moveCursor t 0 next-line)
-      next-line)))
+    (.moveCursor t 0 next-line)
+    next-line))
 
 (defn- print-line [^Terminal t s current-line]
   (do (doseq [c s] (.putCharacter t c))
@@ -57,13 +57,13 @@
 (defn- apply-style [^Terminal t v is-cell-value is-in-triple is-in-cluster]
   (letfn [(applySGR [sgr]
             (.applySGR t (into-array [sgr])))]
-   (do (if is-cell-value
-         (.applyForegroundColor t (get-color v))
-         (.applyForegroundColor t Terminal$Color/DEFAULT))
-       (if is-in-triple (applySGR Terminal$SGR/ENTER_REVERSE))
-       (if is-in-cluster (applySGR Terminal$SGR/ENTER_BLINK))
-       (if-not (or is-cell-value is-in-triple is-in-cluster)
-         (applySGR Terminal$SGR/RESET_ALL)))))
+    (if is-cell-value
+      (.applyForegroundColor t (get-color v))
+      (.applyForegroundColor t Terminal$Color/DEFAULT))
+    (if is-in-triple (applySGR Terminal$SGR/ENTER_REVERSE))
+    (if is-in-cluster (applySGR Terminal$SGR/ENTER_BLINK))
+    (if-not (or is-cell-value is-in-triple is-in-cluster)
+      (applySGR Terminal$SGR/RESET_ALL))))
 
 (defn- print-board [^Terminal t board-seq current-line]
   (loop [s board-seq current-line current-line]
@@ -98,43 +98,42 @@
 
 (defn start-improved [initial-board turns]
   (let [t (create-terminal)]
-    (do
-      (.enterPrivateMode t)
-      (reset-terminal t)
-      (->> 0
-           (print-board t (f/format-board initial-board))
-           (crlf t)
-           (print-line t "Initial board")
-           (print-line t "Starting..."))
-      (loop [turns turns total-score 0]
-        (if-not (seq turns)
-          (do (reset-terminal t)
-              (->> 0
-                   (print-line t "Total score:" total-score)
-                   (print-line t "No more turns possible. Exiting.")))
-          (let [{score :score
-                 board :board
-                 triple :triple
-                 rotation :rotation
-                 cluster-cells :cluster-cells} (first turns)
-                 total-score' (+ total-score score)]
-            (do (reset-terminal t)
-                (->> 0
-                     (print-board
-                      t (f/format-board board
-                                        :triple-cells (set triple)
-                                        :cluster-cells cluster-cells))
-                     (crlf t)
-                     (print-line t (str "Triple: " triple))
-                     (print-line t (str "Rotated: " (name rotation)))
-                     (print-line t (str "Score achieved: " score))
-                     (print-line t (str "Total score: " total-score))
-                     (crlf t)
-                     (print-line t (str "Press space to pause, q to quit.")))
-                (wait-turn)
-                (check-hotkeys t)
-                (recur (rest turns) (long total-score'))))))
-      (.exitPrivateMode t))))
+    (.enterPrivateMode t)
+    (reset-terminal t)
+    (->> 0
+         (print-board t (f/format-board initial-board))
+         (crlf t)
+         (print-line t "Initial board")
+         (print-line t "Starting..."))
+    (loop [turns turns total-score 0]
+      (if-not (seq turns)
+        (do (reset-terminal t)
+            (->> 0
+                 (print-line t "Total score:" total-score)
+                 (print-line t "No more turns possible. Exiting.")))
+        (let [{score :score
+               board :board
+               triple :triple
+               rotation :rotation
+               cluster-cells :cluster-cells} (first turns)
+               total-score' (+ total-score score)]
+          (reset-terminal t)
+          (->> 0
+               (print-board
+                t (f/format-board board
+                                  :triple-cells (set triple)
+                                  :cluster-cells cluster-cells))
+               (crlf t)
+               (print-line t (str "Triple: " triple))
+               (print-line t (str "Rotated: " (name rotation)))
+               (print-line t (str "Score achieved: " score))
+               (print-line t (str "Total score: " total-score))
+               (crlf t)
+               (print-line t (str "Press space to pause, q to quit.")))
+          (wait-turn)
+          (check-hotkeys t)
+          (recur (rest turns) (long total-score')))))
+    (.exitPrivateMode t)))
 
 (defn start-fallback [initial-board turns]
   (do
@@ -150,12 +149,11 @@
                triple :triple
                rotation :rotation} (first turns)
                total-score' (+ total-score score)]
-          (do
-            (println (f/format-board-simple board))
-            (println)
-            (println "Triple:" triple)
-            (println "Rotated:" (name rotation))
-            (println "Score achieved:" score)
-            (println "Total score:" total-score')
-            (wait-turn)
-            (recur (rest turns) (long total-score'))))))))
+          (println (f/format-board-simple board))
+          (println)
+          (println "Triple:" triple)
+          (println "Rotated:" (name rotation))
+          (println "Score achieved:" score)
+          (println "Total score:" total-score')
+          (wait-turn)
+          (recur (rest turns) (long total-score')))))))
