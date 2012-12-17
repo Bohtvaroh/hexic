@@ -49,8 +49,8 @@
     next-line))
 
 (defn- print-line [^Terminal t s current-line]
-  (do (doseq [c s] (.putCharacter t c))
-      (crlf t current-line)))
+  (doseq [c s] (.putCharacter t c))
+  (crlf t current-line))
 
 (defn- apply-style [^Terminal t v is-cell-value is-in-triple is-in-cluster]
   (letfn [(applySGR [sgr]
@@ -90,9 +90,9 @@
                  (do (swap! paused (constantly true))
                      (recur t)))
         nil)
-      (if @paused
-        (do (Thread/sleep 800)
-            (recur t))))))
+      (when @paused
+        (Thread/sleep 800)
+        (recur t)))))
 
 (defn start-improved [initial-board turns]
   (let [t (create-terminal)]
@@ -134,24 +134,23 @@
     (.exitPrivateMode t)))
 
 (defn start-fallback [initial-board turns]
-  (do
-    (println "Initial board:")
-    (println (f/format-board-simple initial-board))
-    (println "Starting...")
-    (wait-turn)
-    (loop [turns turns total-score 0]
-      (if-not (seq turns)
-        (println "No more turns possible. Exiting...")
-        (let [{score :score
-               board :board
-               triple :triple
-               rotation :rotation} (first turns)
-               total-score' (+ total-score score)]
-          (println (f/format-board-simple board))
-          (println)
-          (println "Triple:" triple)
-          (println "Rotated:" (name rotation))
-          (println "Score achieved:" score)
-          (println "Total score:" total-score')
-          (wait-turn)
-          (recur (rest turns) (long total-score')))))))
+  (println "Initial board:")
+  (println (f/format-board-simple initial-board))
+  (println "Starting...")
+  (wait-turn)
+  (loop [turns turns total-score 0]
+    (if-not (seq turns)
+      (println "No more turns possible. Exiting...")
+      (let [{score :score
+             board :board
+             triple :triple
+             rotation :rotation} (first turns)
+             total-score' (+ total-score score)]
+        (println (f/format-board-simple board))
+        (println)
+        (println "Triple:" triple)
+        (println "Rotated:" (name rotation))
+        (println "Score achieved:" score)
+        (println "Total score:" total-score')
+        (wait-turn)
+        (recur (rest turns) (long total-score'))))))
