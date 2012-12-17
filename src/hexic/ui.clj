@@ -25,12 +25,12 @@
 (defn- update-last-turn-time []
   #(swap! last-turn-time (constantly (System/currentTimeMillis))))
 (defn- wait-turn []
-  (let [current-time (System/currentTimeMillis)]
-    (let [prev-time @last-turn-time
-          time-spent (if prev-time (- current-time prev-time) 0)
-          time-left (- min-turn-duration time-spent)]
-      (if (pos? time-left)
-        (Thread/sleep time-left)))
+  (let [current-time (System/currentTimeMillis)
+        prev-time @last-turn-time
+        time-spent (if prev-time (- current-time prev-time) 0)
+        time-left (- min-turn-duration time-spent)]
+    (if (pos? time-left)
+      (Thread/sleep time-left))
     (update-last-turn-time)))
 
 (defn ^Terminal create-terminal []
