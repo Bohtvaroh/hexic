@@ -107,7 +107,7 @@
       (if-not (seq turns)
         (do (reset-terminal t)
             (->> 0
-                 (print-line t "Total score:" total-score)
+                 (print-line t (str "Total score: " total-score))
                  (print-line t "No more turns possible. Exiting.")))
         (let [{score :score
                board :board
