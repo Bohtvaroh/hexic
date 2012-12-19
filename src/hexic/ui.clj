@@ -24,13 +24,18 @@
 (def ^:private min-turn-duration "Minimum turn duration in ms." 1600)
 (defn- update-last-turn-time []
   #(swap! last-turn-time (constantly (System/currentTimeMillis))))
-(defn- wait-turn []
-  (let [current-time (System/currentTimeMillis)
-        time-spent (if @last-turn-time (- current-time @last-turn-time) 0)
-        time-left (- min-turn-duration time-spent)]
-    (if (pos? time-left)
-      (Thread/sleep time-left))
-    (update-last-turn-time)))
+(defn- wait-turn
+  ([]
+     (wait-turn 1))
+  ([n]
+     (if-not (zero? n)
+       (let [current-time (System/currentTimeMillis)
+             time-spent (if @last-turn-time (- current-time @last-turn-time) 0)
+             time-left (- min-turn-duration time-spent)]
+         (if (pos? time-left)
+           (Thread/sleep time-left))
+         (update-last-turn-time)
+         (recur (dec n))))))
 
 (defn ^Terminal create-terminal []
   (let [create-unix #(UnixTerminal.
@@ -108,7 +113,8 @@
         (do (reset-terminal t)
             (->> 0
                  (print-line t (str "Total score: " total-score))
-                 (print-line t "No more turns possible. Exiting.")))
+                 (print-line t "No more turns possible. Exiting."))
+            (wait-turn 3))
         (let [{score :score
                board :board
                triple :triple
