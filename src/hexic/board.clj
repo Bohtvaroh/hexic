@@ -1,6 +1,7 @@
 (ns hexic.board
   [:require [hexic [util :as u]]]
-  [:require [clojure [set :as set]]])
+  [:require [clojure [set :as set]]]
+  #_ [:require [clojure.core [reducers :as r]]])
 
 (defn get-board-width [b]
   (count (first b))) ; first row size determines board width
@@ -123,41 +124,34 @@
     (set-cell-values board
                      a c-value b a-value c b-value)))
 
-(defn rotate-best
-  "Finds and returns best turn resulting in highest score gained."
+(defn- get-all-possible-rotations
+  "Returns a seq of all possible board alterations
+  in form of [board triple rotation]."
   [board]
-  (let [candidates
-        (mapcat (fn [triple]
+  (mapcat (fn [triple]
                   (let [board' (rotate-triple board triple)
                         board'' (rotate-triple board' triple)]
                     [[board' triple :right] [board'' triple :left]]))
-                (get-all-triples board))]
-    (loop [candidates candidates
-           cb-score 0                   ; cb stands for 'current best'
-           cb-board nil
-           cb-triple nil
-           cb-rotation nil
-           cb-cluster-cells nil]
-      (if-not (seq candidates)
-        {:score cb-score
-         :board cb-board
-         :triple cb-triple
-         :rotation cb-rotation
-         :cluster-cells cb-cluster-cells}
-        (let [[b triple rotation] (first candidates)
-              clusters (find-clusters b)
-              score (get-score clusters)
-              cluster-cells (set (apply concat clusters))]
-          (let [[nb-score nb-board nb-triple nb-rotation nb-cluster-cells]
-                (if (> score cb-score)
-                  [score b triple rotation cluster-cells]
-                  [cb-score cb-board cb-triple cb-rotation cb-cluster-cells])]
-            (recur (rest candidates)
-                   (long nb-score)      ; nb stands for 'new best'
-                   nb-board
-                   nb-triple
-                   nb-rotation
-                   nb-cluster-cells)))))))
+                (get-all-triples board)))
+
+(defn rotate-best
+  "Finds and returns best turn resulting in highest score gained."
+  [board]
+  (let [candidates (vec (get-all-possible-rotations board))
+        reducef (fn ([] {:score 0})
+                  ([a b] (if (> (:score a) (:score b)) a b)))]
+    (reduce                             ; TODO clojure 1.5 replace with r/fold
+     reducef
+     (map                               ; TODO clojure 1.5 replace with r/map
+      (fn [[b t r]]
+        (let [clusters (find-clusters b)
+              score (get-score clusters)]
+          {:score score
+           :board b
+           :triple t
+           :rotation r
+           :cluster-cells (set (apply concat clusters))}))
+      candidates))))
 
 (defn- get-column-index
   "Returns virtual column index."

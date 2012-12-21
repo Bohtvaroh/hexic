@@ -21,7 +21,7 @@
     Terminal$Color/DEFAULT))
 
 (def ^:private last-turn-time (atom nil))
-(def ^:private min-turn-duration "Minimum turn duration in ms." 1600)
+(def ^:private min-turn-duration "Minimum turn duration in ms." 2000)
 (defn- update-last-turn-time []
   #(swap! last-turn-time (constantly (System/currentTimeMillis))))
 (defn- wait-turn
@@ -96,7 +96,7 @@
                      (recur t)))
         nil)
       (when @paused
-        (Thread/sleep 800)
+        (Thread/sleep 500)
         (recur t)))))
 
 (defn start-improved [initial-board turns]

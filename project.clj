@@ -5,4 +5,5 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [com.googlecode.lanterna/lanterna "2.1.1"]]
-  :main hexic.core)
+  :main hexic.core
+  :warn-on-reflection true)
