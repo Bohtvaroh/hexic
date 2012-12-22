@@ -139,19 +139,17 @@
   [board]
   (let [candidates (vec (get-all-possible-rotations board))
         reducef (fn ([] {:score 0})
-                  ([a b] (if (> (:score a) (:score b)) a b)))]
-    (reduce                             ; TODO clojure 1.5 replace with r/fold
-     reducef
-     (map                               ; TODO clojure 1.5 replace with r/map
-      (fn [[b t r]]
-        (let [clusters (find-clusters b)
-              score (get-score clusters)]
-          {:score score
-           :board b
-           :triple t
-           :rotation r
-           :cluster-cells (set (apply concat clusters))}))
-      candidates))))
+                    ([a b] (if (> (:score a) (:score b)) a b)))
+        mapf (fn [[b t r]]
+               (let [clusters (find-clusters b)
+                     score (get-score clusters)]
+                 {:score score
+                  :board b
+                  :triple t
+                  :rotation r
+                  :cluster-cells (set (apply concat clusters))}))]
+    ;; TODO clojure 1.5 change reduce to r/fold, map to r/map
+    (reduce reducef (map mapf candidates))))
 
 (defn- get-column-index
   "Returns virtual column index."
