@@ -27,10 +27,8 @@
   (update-in board (reverse coord) (constantly value)))
 
 (defn- set-cell-values [board & pairs]
-  (loop [board board [coord value & more :as pairs] pairs]
-    (if (seq pairs)
-      (recur (set-cell-value board coord value) more)
-      board)))
+  (reduce (fn [b [coord value]]
+            (set-cell-value b coord value)) board (partition 2 pairs)))
 
 (defn- neighbor-cells
   "Returns lazy seq of pairs of (value coord) of neighbor cells
