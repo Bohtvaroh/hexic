@@ -24,18 +24,13 @@
 (def ^:private min-turn-duration "Minimum turn duration in ms." 2000)
 (defn- update-last-turn-time []
   #(swap! last-turn-time (constantly (System/currentTimeMillis))))
-(defn- wait-turn
-  ([]
-     (wait-turn 1))
-  ([n]
-     (if-not (zero? n)
-       (let [current-time (System/currentTimeMillis)
-             time-spent (if @last-turn-time (- current-time @last-turn-time) 0)
-             time-left (- min-turn-duration time-spent)]
-         (if (pos? time-left)
-           (Thread/sleep time-left))
-         (update-last-turn-time)
-         (recur (dec n))))))
+(defn- wait-turn []
+  (let [current-time (System/currentTimeMillis)
+        time-spent (if @last-turn-time (- current-time @last-turn-time) 0)
+        time-left (- min-turn-duration time-spent)]
+    (if (pos? time-left)
+      (Thread/sleep time-left))
+    (update-last-turn-time)))
 
 (defn ^Terminal create-terminal []
   (let [create-unix #(UnixTerminal.
@@ -83,6 +78,9 @@
       (crlf t current-line))))
 
 (def ^:private paused (atom false))
+(defn pause
+  ([] (pause true))
+  ([b] (swap! paused (constantly b))))
 (defn- check-hotkeys [^Terminal t]
   (let [key (.readInput t)]
     (if (and key (= (.getKind key) Key$Kind/NormalKey))
@@ -90,9 +88,9 @@
         \q (do (.exitPrivateMode t)
                (System/exit 1))
         \space (if @paused
-                 (do (swap! paused (constantly false))
+                 (do (pause false)
                      (update-last-turn-time))
-                 (do (swap! paused (constantly true))
+                 (do (pause)
                      (recur t)))
         nil)
       (when @paused
@@ -113,8 +111,9 @@
         (do (reset-terminal t)
             (->> 0
                  (print-line t (str "Total score: " total-score))
-                 (print-line t "No more turns possible. Exiting."))
-            (wait-turn 3))
+                 (print-line t "No more turns possible. Press q to quit."))
+            (pause)
+            (check-hotkeys t))
         (let [{score :score
                board :board
                triple :triple
