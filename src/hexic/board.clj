@@ -1,7 +1,7 @@
 (ns hexic.board
   [:require [hexic [util :as u]]]
   [:require [clojure [set :as set]]]
-  #_ [:require [clojure.core [reducers :as r]]])
+  [:require [clojure.core [reducers :as r]]])
 
 (defn get-board-width [b]
   (count (first b))) ; first row size determines board width
@@ -146,8 +146,7 @@
                   :triple t
                   :rotation r
                   :cluster-cells (set (apply concat clusters))}))]
-    ;; TODO clojure 1.5 change reduce to r/fold, map to r/map
-    (reduce reducef (map mapf candidates))))
+    (r/fold reducef (r/map mapf candidates))))
 
 (defn- get-column-index
   "Returns virtual column index."
